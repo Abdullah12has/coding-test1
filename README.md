@@ -15,7 +15,7 @@ npm run dev
 npm run build
 
 # to start the build file
-# npm run start
+npm run start
 
 ```
 
