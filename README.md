@@ -2,6 +2,24 @@
 
 Thank you for taking out the time to check out my code.
 
+### To Run the Server
+```python
+# make sure your terminal is in the project directory
+npm install
+# after the installation of depedencies is complete
+
+# to run it locally for developmental purposes
+npm run dev
+
+# to make a build file
+npm run build
+
+# to start the build file
+# npm run start
+
+```
+
+
 
 ### Testing if API is working properly
 ```python
