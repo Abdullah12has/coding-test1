@@ -15,20 +15,13 @@ const getPrimaryButtonStyles = (page) => __awaiter(void 0, void 0, void 0, funct
         const button = document.querySelector('form[action*="/cart/add"] button');
         if (button) {
             const computedStyles = window.getComputedStyle(button);
-            return {
-                fontFamily: computedStyles.fontFamily,
-                fontSize: computedStyles.fontSize,
-                lineHeight: computedStyles.lineHeight,
-                letterSpacing: computedStyles.letterSpacing,
-                textTransform: computedStyles.textTransform,
-                textDecoration: computedStyles.textDecoration,
-                textAlign: computedStyles.textAlign,
-                backgroundColor: computedStyles.backgroundColor,
-                color: computedStyles.color,
-                borderColor: computedStyles.borderColor,
-                borderWidth: computedStyles.borderWidth,
-                borderRadius: computedStyles.borderRadius,
-            };
+            const styles = {};
+            // Iterate through all properties in the computed styles
+            for (let i = 0; i < computedStyles.length; i++) {
+                const property = computedStyles[i];
+                styles[property] = computedStyles.getPropertyValue(property);
+            }
+            return styles;
         }
         return null;
     });

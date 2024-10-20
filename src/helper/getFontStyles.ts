@@ -1,34 +1,45 @@
 import { Page } from 'puppeteer';
 
 export const getFontStyles = async (page: Page) => {
-    return page.evaluate(() => {
-      const fonts: any[] = [];
-      const fontLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'));
-      
-      fontLinks.forEach((link) => {
-        const fontUrl = link.getAttribute('href') || '';
-        if (fontUrl.includes('fonts.googleapis.com')) {
-          const styleSheet = document.styleSheets;
-          for (let i = 0; i < styleSheet.length; i++) {
-            try {
-              const rules = styleSheet[i].cssRules;
-              for (let rule of rules) {
-                if (rule instanceof CSSFontFaceRule) {
-                  fonts.push({
-                    family: rule.style.fontFamily,
-                    variants: rule.style.fontWeight || '400',
-                    letterSpacings: rule.style.letterSpacing || 'normal',
-                    fontWeight: rule.style.fontWeight,
-                    url: fontUrl,
-                  });
-                }
-              }
-            } catch (err) {
-              console.error(err);
-            }
-          }
+  return page.evaluate(() => {
+    const fonts: any[] = [];
+
+    // Get all elements in the document
+    const elements = document.querySelectorAll('*');
+    const foundFontUrls: Set<string> = new Set();
+
+    elements.forEach((element) => {
+      const computedStyle = window.getComputedStyle(element);
+      const fontFamily = computedStyle.fontFamily;
+      const fontWeight = computedStyle.fontWeight;
+      const letterSpacing = computedStyle.letterSpacing;
+
+      // Add fonts to the array
+      if (fontFamily) {
+        const fontObj = {
+          family: fontFamily.replace(/['"]/g, ''), // Clean up quotes
+          fontWeight: fontWeight || 'normal',
+          letterSpacing: letterSpacing || 'normal',
+        };
+
+        if (!fonts.some(f => f.family === fontObj.family && f.fontWeight === fontObj.fontWeight)) {
+          fonts.push(fontObj);
         }
-      });
-      return fonts;
+      }
     });
-  };
+
+    const linkTags = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'));
+
+    linkTags.forEach((link) => {
+      const fontUrl = link.getAttribute('href') || '';
+      if (fontUrl.includes('fonts.googleapis.com')) {
+        foundFontUrls.add(fontUrl);
+      }
+    });
+
+    return fonts.map((font) => ({
+      ...font,
+      url: Array.from(foundFontUrls).join(', ') || " "
+    }));
+  });
+};
